@@ -9,6 +9,10 @@ var app = express();
 
 app.use(bodyParser.json());
 
+app.get('/', (req, res) => {
+    res.send('This is the home page');
+});
+
 app.post('/todos', (req, res) => {
     var todo = new Todo({
         text: req.body.text
@@ -24,3 +28,7 @@ app.post('/todos', (req, res) => {
 app.listen(3000, () => {
     console.log('Server is running on port 3000');
 })
+
+module.exports = {
+    app
+}
