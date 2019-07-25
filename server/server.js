@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const {ObjectID} = require('mongodb');
 
 const {moongose} = require('./db/mongoose');
 const {Todo} = require('./models/todo');
@@ -17,7 +18,7 @@ app.get('/todos', (req, res) => {
 
     Todo.find().then((todos) => {
         res.send({
-            "Todos count": todos.length,
+            "todos_count": todos.length,
             todos
         });
     }).catch((e) => {
@@ -37,10 +38,47 @@ app.post('/todos', (req, res) => {
     });
 });
 
+// HEROMORA'S VERSION
+// app.get('/todos/:id', (req, res) => {
+//     let id = req.params.id;
+
+//     if (ObjectID.isValid(id)) {
+//         return res.status(404).send({
+//             "error": "todo not found"
+//         });
+//     }
+//     Todo.findById(id).then((todo) => {
+//         return res.status(200).send(todo);
+//     })       
+//     res.status(200).send({todo});
+
+//     }).catch((e) => {
+//         res.status(400).send({
+//             "error": "Invalid ID",
+//             "error_content": e
+//         })
+// });
+
+
+app.get('/todos/:id', (req, res) => {
+    let id = req.params.id;
+    if (!ObjectID.isValid(id)) {
+        return res.status(404).send();
+    }
+    Todo.findById(id).then((todo) => {
+        if (!todo) {
+            return res.status(404).send();
+        }
+        res.status(200).send({todo});
+    }).catch((e) => {
+        res.status(400).send();
+    });
+});
+
 app.listen(3000, () => {
     console.log('Server is running on port 3000');
     console.log('You can access it using http://localhost:3000/');
-})
+});
 
 module.exports = {
     app
