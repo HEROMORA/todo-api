@@ -41,28 +41,6 @@ app.post('/todos', (req, res) => {
     });
 });
 
-// HEROMORA'S VERSION
-// app.get('/todos/:id', (req, res) => {
-//     let id = req.params.id;
-
-//     if (ObjectID.isValid(id)) {
-//         return res.status(404).send({
-//             "error": "todo not found"
-//         });
-//     }
-//     Todo.findById(id).then((todo) => {
-//         return res.status(200).send(todo);
-//     })       
-//     res.status(200).send({todo});
-
-//     }).catch((e) => {
-//         res.status(400).send({
-//             "error": "Invalid ID",
-//             "error_content": e
-//         })
-// });
-
-
 app.get('/todos/:id', (req, res) => {
     let id = req.params.id;
     if (!ObjectID.isValid(id)) {
@@ -120,6 +98,21 @@ app.patch('/todos/:id', (req, res) => {
         res.status(400).send();
     });
 });
+
+app.post('/users', (req, res) => {
+    let body = _.pick(req.body, ['email', 'password']);
+    let user = new User(body); 
+
+    user.save().then((user) => {
+        return user.generateAuthToken();
+    }).then((token) => {
+        res.header('x-auth', token).send(user)
+    }).catch((e) => {
+        res.status(400).send(e);
+    });
+});
+
+
 
 app.listen(3000, () => {
     console.log('Server is running on port 3000');

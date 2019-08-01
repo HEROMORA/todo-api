@@ -1,8 +1,15 @@
 const mongoose = require('mongoose');
 
-mongoose.Promise = global.Promise;
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/TodoApp', { useNewUrlParser: true});
 mongoose.set('useFindAndModify', false);
+mongoose.Promise = global.Promise;
+
+const url = process.env.MONGODB_URI || 'mongodb://localhost:27017/TodoApp'
+const opts = {
+    useNewUrlParser: true
+}
+
+mongoose.connect(url, opts);
+
 
 module.exports = {
     mongoose
