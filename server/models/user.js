@@ -39,16 +39,38 @@ UserSchema.methods.toJSON = function() {
 };
 
 UserSchema.methods.generateAuthToken =  function() {
+    // INSTANCE VARIABLES GETS CALLED WITH LOWER 'U'
     let user = this;
     let access = 'auth';
     let token = jwt.sign({_id: user._id.toHexString(), access}, 'abc123').toString();
 
     user.tokens = user.tokens.concat([{access, token}]);
-
     return user.save().then(() => {
         return token;
     });
-}
+};
+
+UserSchema.statics.findByToken = function(token) {
+    // MODEL VARIABLES GETS CALLED WITH UPPER 'U'
+    let User = this;
+    let decoded;
+
+    try {
+        decoded = jwt.verify(token, 'abc123');
+    } catch (e) {
+        // return new Promise((resolve, reject) => {
+        //     reject();
+        // })
+        return Promise.reject();
+    }
+
+    return User.findOne({
+        // WE USE THE QUOTES IF THERE IS A DOTS IN THE KEY
+        '_id': decoded._id,
+        'tokens.token': token,
+        'tokens.access': 'auth'
+    });
+};
 
 const User = mongoose.model('User', UserSchema);
 
