@@ -122,6 +122,7 @@ app.get('/users/me', authenticate, (req, res) => {
 app.listen(3000, () => {
     console.log('Server is running on port 3000');
     console.log('You can access it using http://localhost:3000/');
+    console.log(process.env.NODE_ENV);
 });
 
 module.exports = {
