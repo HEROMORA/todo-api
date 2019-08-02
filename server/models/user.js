@@ -55,6 +55,7 @@ UserSchema.methods.removeToken = function(token) {
     let user = this;
 
     return user.updateOne({
+        //PULL DELETES THE WHOLE TOKEN NOT THE JUST THE TOKEN PROPERTY
         $pull: {
             tokens: {token}            
         }
