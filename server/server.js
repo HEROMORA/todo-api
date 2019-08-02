@@ -4,11 +4,14 @@ const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
+const bcrcypt = require('bcryptjs');
 
 const {moongose} = require('./db/mongoose');
 const {Todo} = require('./models/todo');
 const {User} = require('./models/user');
 const {authenticate} = require('./middleware/authenticate');
+
+const port = 3000;
 
 var app = express();
 
@@ -107,22 +110,30 @@ app.post('/users', (req, res) => {
     user.save().then((user) => {
         return user.generateAuthToken();
     }).then((token) => {
-        res.header('x-auth', token).send(user)
+        res.header('x-auth', token).send(user);
     }).catch((e) => {
         res.status(400).send(e);
     });
 });
 
-
+app.post('/users/login', (req, res) => {
+    let body = _.pick(req.body, ['email', 'password']);
+    
+    User.findByCredentials(body.email, body.password).then((user) => {
+        return user.generateAuthToken().then((token) => {
+            res.header('x-auth', token).send(user);
+        });
+    }).catch((e) => {
+        res.status(400).send();
+    });
+});
 
 app.get('/users/me', authenticate, (req, res) => {
     res.send(req.user);
 });
 
-app.listen(3000, () => {
-    console.log('Server is running on port 3000');
-    console.log('You can access it using http://localhost:3000/');
-    console.log(process.env.NODE_ENV);
+app.listen(port, () => {
+    console.log(`You can access it using http://localhost:${port}/`);
 });
 
 module.exports = {
